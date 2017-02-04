@@ -1,0 +1,20 @@
+CLUSTER 
+
+fisi3028
+201710fisi3028
+
+ssh fisi3028@clustergate.uniandes.edu.co
+rm .ssh/known_hosts
+lscpu
+qnodes
+colarse 
+showq
+qstat -q
+mpicc compilador
+ejecutar normal
+mpiexec -n 4 ./mpi_hello_world sin encolador
+qsub submit_job.sh
+qstat
+mas comandos empezando por q
+qsub -I -q short
+

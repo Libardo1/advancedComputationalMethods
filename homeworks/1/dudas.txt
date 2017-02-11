@@ -1,0 +1,3 @@
+Dudas:
+
+1. ¿Cómo saber el número máximo de procesadores en la máquina?

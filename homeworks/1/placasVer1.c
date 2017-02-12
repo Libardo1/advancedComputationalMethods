@@ -61,7 +61,7 @@ int main(int argc, char** argv){
 	
 //	double *l_send 	= malloc(m*sizeof(double));
 //	double *r_send 	= malloc(m*sizeof(double));
-	double l_send,r_send,l_recv, r_recv;
+	double l_send,r_send,l_recv, r_recv, send, recv;
 //	double *l_recv 	= malloc(m*sizeof(double));
 //	double *r_recv 	= malloc(m*sizeof(double));
 	
@@ -103,7 +103,6 @@ int main(int argc, char** argv){
 	while (n < N)
 	{	
 		// We divide the grid in equal-size parts according to the number of processes 	
-		k = 0;
 		for(j = initial; j <= final; j++)
 		{
 			for(i = 1; i < m; i++)
@@ -121,7 +120,6 @@ int main(int argc, char** argv){
 				{
 //					printf("I am process %d with k: %d, sub_m: %d , size : %d , i %d, j %d\n", world_rank, k, size*m, size,i,j);
 				}
-				k++;
 			}
 		}
 			
@@ -194,12 +192,50 @@ int main(int argc, char** argv){
 			}
 		}
 		
+		MPI_Barrier( MPI_COMM_WORLD );
+
 		n += 1;
 		if( world_rank == 0)
 		{
 			printf("n : %d\n",n);
 		}
-	}	
+	}
+
+	// Receive all data to one node. 
+		
+	MPI_Barrier( MPI_COMM_WORLD );
+
+	if(world_rank!= 0)
+	{
+		for(j = initial; j <= final; j++)
+		{
+			for(i = 1; i < m; i++)
+			{				
+				send = V_new[transformer(i,j)];
+				MPI_Send(&send, 1, MPI_FLOAT,0, transformer(i,j), MPI_COMM_WORLD);
+				printf("rank %d 		i %d 		j %d\n", world_rank, i ,j);
+			}
+		}
+	}
+	MPI_Barrier( MPI_COMM_WORLD );
+
+	if(world_rank == 0)
+	{
+		for (k = 1;k < world_size;k++)
+		{ 
+			for(j = initial; j <= final; j++)
+			{
+				for(i = 1; i < m; i++)
+				{				
+					MPI_Recv(&recv, 1, MPI_FLOAT, k,transformer(i,j), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					V_new[transformer(i,j)] = recv;
+					printf("process %d 		i %d 		j %d\n", k, i ,j);
+				}
+			}
+		}			
+	}
+		
+		
 	MPI_Finalize();	
 	return(0);
 }

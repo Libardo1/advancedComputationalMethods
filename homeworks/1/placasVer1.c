@@ -53,17 +53,17 @@ int main(int argc, char** argv){
 	
 //	printf("x0 %d, x1 %d, y0 %d, y1 %d\n",x0,x1,y0,y1);
 
-// Create the total array in each process
+	// Create the total array in each process
 	double *V 		= malloc(m*m*sizeof(double));
 	double *V_new 	= malloc(m*m*sizeof(double));
 	V 		= init(x0, x1, y0, y1, V);
 	V_new 	= init(x0, x1, y0, y1, V);
 	
-	double *l_send 	= malloc(m*sizeof(double));
-	double *r_send 	= malloc(m*sizeof(double));
-	
-	double *l_recv 	= malloc(m*sizeof(double));
-	double *r_recv 	= malloc(m*sizeof(double));
+//	double *l_send 	= malloc(m*sizeof(double));
+//	double *r_send 	= malloc(m*sizeof(double));
+	double l_send,r_send,l_recv, r_recv;
+//	double *l_recv 	= malloc(m*sizeof(double));
+//	double *r_recv 	= malloc(m*sizeof(double));
 	
 //	if (world_rank == 0)
 //	{ int h,k;
@@ -82,22 +82,24 @@ int main(int argc, char** argv){
 	if (world_rank == 0)
 	{
 		initial = 1;
-		final 	= (sub_m + 1);
+		final 	= sub_m;
 	}
 	else if (world_rank == world_size-1)
 	{
 		initial = (sub_m * world_rank - 1)   ;
-		final 	= m -1;	
+		final 	= m -2;	
 	}		
 	else
 	{
-		initial = (sub_m * world_rank - 1)  ;	
-		final 	= (sub_m * (world_rank +1) + 1) ; 
+		initial = sub_m * world_rank - 1  ;	
+		final 	= sub_m * (world_rank +1)  ; 
 	}
-	
 	int size 	= final - initial + 1;
 	
 			
+//	printf("limit : %d, size: %d \n", size*m,size);
+//	printf("process %d , initial : %d, final: %d \n", world_rank, initial, final);
+
 	while (n < N)
 	{	
 		// We divide the grid in equal-size parts according to the number of processes 	
@@ -106,21 +108,18 @@ int main(int argc, char** argv){
 		{
 			for(i = 1; i < m; i++)
 			{				
-				if( k < sub_m)
-				{
-					up 		= transformer(i-1, j);
-					down 	= transformer(i+1, j);
-					left 	= transformer(i, j-1);
-					right 	= transformer(i, j+1);
-					if (!(j >= x0 && j <= x1 && i == y0) && !(j >= x0 && j <= x1 && i == y1))
-					{	
-						average = (V[up] + V[down] + V[left] + V[right])/4;
-						V_new[transformer(i,j)] = average;
-					}
+				up 		= transformer(i-1, j);
+				down 	= transformer(i+1, j);
+				left 	= transformer(i, j-1);
+				right 	= transformer(i, j+1);
+				if (!(j >= x0 && j <= x1 && i == y0) && !(j >= x0 && j <= x1 && i == y1))
+				{	
+					average = (V[up] + V[down] + V[left] + V[right])/4;
+					V_new[transformer(i,j)] = average;
 				}
-				else{
-					i = m;
-					j = final+1;
+				if (world_rank==2)
+				{
+//					printf("I am process %d with k: %d, sub_m: %d , size : %d , i %d, j %d\n", world_rank, k, size*m, size,i,j);
 				}
 				k++;
 			}
@@ -128,78 +127,70 @@ int main(int argc, char** argv){
 			
 		MPI_Barrier( MPI_COMM_WORLD );
 		
-		k = 0;
 		for(j = initial; j <= final; j++)
 		{
 			for(i = 1; i < m; i++)
 			{				
-				if( k < sub_m)
-				{		
-					V[transformer(i,j)] = V_new[transformer(i,j)];	
-				}
-				else{
-					i = m;
-					j = final+1;
-				}
-				k++;
+				V[transformer(i,j)] = V_new[transformer(i,j)];	
 			}
 		}
 				
 				
 		// Preparing data to send between process
 		if(world_rank == 0)
-		{
+		{ 
 			for (i = 0; i < m; i++)
 			{
-				r_send[i] = V_new[transformer(i,sub_m-1)];
+				r_send = V_new[transformer(i,sub_m-1)];
+				MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, m + i, MPI_COMM_WORLD);
 			}
-			MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, 1, MPI_COMM_WORLD);
 		}
 		else if(world_rank == world_size-1)
 		{
 			for (i = 0; i < m; i++)
 			{
-				l_send[i] = V_new[transformer(i,sub_m*world_rank+1)];
+				l_send = V_new[transformer(i,sub_m*world_rank+1)];
+				MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, i, MPI_COMM_WORLD);
 			}	
-			MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, 0, MPI_COMM_WORLD);
-
 		}
 		else
 		{	
 			for (i = 0; i < m; i++)
 			{
-				l_send[i] = V_new[transformer(i,sub_m*world_rank+1)];
-				r_send[i] = V_new[transformer(i,sub_m*(world_rank+1)-1)];
+				l_send = V_new[transformer(i,sub_m*world_rank+1)];
+				r_send = V_new[transformer(i,sub_m*(world_rank+1)-1)];
+				MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, m+i, MPI_COMM_WORLD);
+				MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, i, MPI_COMM_WORLD);
 			}	
-			MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, 1, MPI_COMM_WORLD);
-			MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, 0, MPI_COMM_WORLD);
 		}
 		
+		MPI_Barrier( MPI_COMM_WORLD );
+
 		// Recieve information between process
 		if(world_rank == 0)
-		{
-			MPI_Recv(&r_recv, 1, MPI_FLOAT, world_rank+1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		{	
 			for (i = 0; i < m; i++)
 			{
-				V[transformer(i,sub_m-1)] = r_recv[i];
+				MPI_Recv(&r_recv, 1, MPI_DOUBLE, world_rank+1, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				V[transformer(i,sub_m-1)] = r_recv;
 			}
 		}
 		else if(world_rank == world_size-1)
 		{
-			MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			for (i = 0; i < m; i++)
 			{
-				V[transformer(i,sub_m*world_rank+1)] = l_recv[i];
+				MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, m + i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				V[transformer(i,sub_m*world_rank+1)] = l_recv;
 			}
 		}
 		else
 		{	
-			MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			MPI_Recv(&r_recv, 1, MPI_FLOAT, world_rank+1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			for (i = 0; i < m; i++)
 			{
-				V[transformer(i,sub_m*world_rank+1)] 	 = l_recv[i];
-				V[transformer(i,sub_m*(world_rank+1)-1)] = r_recv[i];
+				MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, m+i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&r_recv, 1, MPI_FLOAT, world_rank+1,   i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				V[transformer(i,sub_m*world_rank+1)] 	 = l_recv;
+				V[transformer(i,sub_m*(world_rank+1)-1)] = r_recv;
 			}
 		}
 		

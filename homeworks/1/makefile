@@ -1,7 +1,10 @@
+#grafica.png: plot.py data.txt
+#	python plot.py
+#data.txt: placas
+#	qsub submit.job 
+#placas:
+#	mpicc placasVer2.c -o placas
+#clean:
 all:
 	mpicc placasVer1.c -o placas
-#	mpiexec -n 4 ./placas 
-ver2:
-	mpicc placasVer2.c -o placasVer2
-#	mpiexec -n 4 ./placasVer2 
-clean:
+	mpiexec -n 4 ./placas 

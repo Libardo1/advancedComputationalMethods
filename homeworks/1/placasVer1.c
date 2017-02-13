@@ -4,14 +4,13 @@
 #include <math.h>
 
 // Some parameters to use in the code
-int L = 5;
-int d = 1, l = 2, V0 = 100, m = 128, N;
+int L = 5, d = 1, l = 2, V0 = 100.00;
+int m = 128, N;
 double h;
 
 // Functions 
 int transformer(int i, int j);
 double *init(int x0, int x1, int y0, int y1, double *array);
-void ind2sub(int *i, int *j, int a, int b, int ind);
 double *init_alt(int row, int col, double *array);
 
 int main(int argc, char** argv){
@@ -42,14 +41,14 @@ int main(int argc, char** argv){
 	int up, down, left, right, x0, x1, y0, y1, i, j, k, n=0;
    	double average;
    	N = 2*m*m;
-   	h = L/(double)m;   		
+   	h = (double)L/(double)m;   		
 
-//	printf("m : %d, l %d, h %f, d %d \n",m,l,h,d);
+//	printf("m : %d, l/h %d, d %d \n",m,l/h,d);
 
-	x0 = m/2 - l/(h*2) - 1;
-	x1 = m/2 + l/(h*2) - 1;
-	y0 = m/2 - d/(h*2) - 1;
-	y1 = m/2 + d/(h*2) - 1;
+	x0 = m/2 - (double)l/(double)L*m;
+	x1 = m/2 + (double)l/(double)L*m;
+	y0 = m/2 - (double)d/(double)L*m;
+	y1 = m/2 + (double)d/(double)L*m;
 	
 //	printf("x0 %d, x1 %d, y0 %d, y1 %d\n",x0,x1,y0,y1);
 
@@ -58,13 +57,29 @@ int main(int argc, char** argv){
 	double *V_new 	= malloc(m*m*sizeof(double));
 	V 		= init(x0, x1, y0, y1, V);
 	V_new 	= init(x0, x1, y0, y1, V);
+
+//	V 		= init_alt(m,m, V);
+//	V_new 	= init_alt(m,m, V);
 	
-	double l_send,r_send,l_recv, r_recv, send, recv;
+	if (world_rank == 0 ){
+	   	FILE *f = fopen("initial_data.txt", "w");
+
+		for(i=0;i < m; i++)
+		{
+			for(j=0;j < m; j++)
+			{
+				fprintf(f,"%f\n", V[transformer(i,j)]);
+
+			}
+		}
+		fclose(f);
+	}
+	
+	double l_send,r_send,l_recv, r_recv, send, recv, test;
 	
 	MPI_Barrier( MPI_COMM_WORLD );
 	int sub_m = (m/world_size);				// Size of each sub part of the total grid in each process
 
-	
 	int initial, final;
 	if (world_rank == 0)
 	{
@@ -99,10 +114,6 @@ int main(int argc, char** argv){
 					average = (V[up] + V[down] + V[left] + V[right])/4;
 					V_new[transformer(i,j)] = average;
 				}
-				if (world_rank==2)
-				{
-//					printf("I am process %d with k: %d, sub_m: %d , size : %d , i %d, j %d\n", world_rank, k, size*m, size,i,j);
-				}
 			}
 		}
 			
@@ -115,15 +126,17 @@ int main(int argc, char** argv){
 				V[transformer(i,j)] = V_new[transformer(i,j)];	
 			}
 		}
-				
-				
+								
 		// Preparing data to send between process
 		if(world_rank == 0)
 		{ 
 			for (i = 0; i < m; i++)
 			{
 				r_send = V_new[transformer(i,final)];
-				MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, m + i, MPI_COMM_WORLD);
+				MPI_Send(&r_send, 1, MPI_DOUBLE, world_rank+1, m + i, MPI_COMM_WORLD);
+//				printf("I am process %d and send %f to %d in the position %d with tag %d\n",world_rank,
+//				r_send, world_rank+1, transformer(i,initial),i);
+
 			}
 		}
 		else if(world_rank == world_size-1)
@@ -131,17 +144,28 @@ int main(int argc, char** argv){
 			for (i = 0; i < m; i++)
 			{
 				l_send = V_new[transformer(i,initial)];
-				MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, i, MPI_COMM_WORLD);
+				MPI_Send(&l_send, 1, MPI_DOUBLE, world_rank-1, i, MPI_COMM_WORLD);
+//				printf("I am process %d and send %f to %d in the position %d with tag %d\n",world_rank,
+//				l_send, world_rank-1, transformer(i,initial),i);
+				
+
 			}	
 		}
 		else
-		{	
+		{
 			for (i = 0; i < m; i++)
 			{
 				l_send = V_new[transformer(i,initial)];
 				r_send = V_new[transformer(i,final)];
-				MPI_Send(&r_send, 1, MPI_FLOAT, world_rank+1, m+i, MPI_COMM_WORLD);
-				MPI_Send(&l_send, 1, MPI_FLOAT, world_rank-1, i, MPI_COMM_WORLD);
+
+//				printf("I am process %d and send %f to %d in the position %d with tag %d\n",world_rank,
+//				l_send, world_rank-1, transformer(i,initial),i);
+//				printf("I am process %d and send %f to %d in the position %d with tag %d\n",world_rank,
+//				r_send, world_rank+1, transformer(i,initial),i);
+
+
+				MPI_Send(&r_send, 1, MPI_DOUBLE, world_rank+1, m+i, MPI_COMM_WORLD);
+				MPI_Send(&l_send, 1, MPI_DOUBLE, world_rank-1, i, MPI_COMM_WORLD);
 			}	
 		}
 		
@@ -153,14 +177,19 @@ int main(int argc, char** argv){
 			for (i = 0; i < m; i++)
 			{
 				MPI_Recv(&r_recv, 1, MPI_DOUBLE, world_rank+1, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+//				printf("I am process %d and recieve %f from %d in the position %d with tag %d\n",world_rank,
+//				r_recv, world_rank+1,transformer(i,final+1),i);
 				V[transformer(i,final+1)] = r_recv;
+
 			}
 		}
 		else if(world_rank == world_size-1)
 		{
 			for (i = 0; i < m; i++)
 			{
-				MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, m + i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&l_recv, 1, MPI_DOUBLE, world_rank-1, m + i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+//				printf("I am process %d and recieve %f from %d in the position %d with tag %d\n",world_rank,
+//				l_recv, world_rank-1,transformer(i,final+1),i);
 				V[transformer(i,initial-1)] = l_recv;
 			}
 		}
@@ -168,12 +197,19 @@ int main(int argc, char** argv){
 		{	
 			for (i = 0; i < m; i++)
 			{
-				MPI_Recv(&l_recv, 1, MPI_FLOAT, world_rank-1, m+i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				MPI_Recv(&r_recv, 1, MPI_FLOAT, world_rank+1,   i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&l_recv, 1, MPI_DOUBLE, world_rank-1, m+i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&r_recv, 1, MPI_DOUBLE, world_rank+1,   i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+//				printf("I am process %d and recieve %f from %d in the position %d with tag %d\n",world_rank,
+//				l_recv, world_rank-1,transformer(i,final+1),i);
+//				printf("I am process %d and recieve %f from %d in the position %d with tag %d\n",world_rank,
+//				r_recv, world_rank+1,transformer(i,final+1),i);
+
 				V[transformer(i,initial-1)] 	= l_recv;
 				V[transformer(i,final+1)] 		= r_recv;
 			}
 		}
+		
 		
 		MPI_Barrier( MPI_COMM_WORLD );
 
@@ -184,13 +220,13 @@ int main(int argc, char** argv){
 		}
 	}
 	
-	for(i=0;i < m; i++)
-		{
-			for(j=0;j < m; j++)
-			{
-				printf("%f,  i %d, j %d \n", V[transformer(i,j)], i, j);
-			}
-		}
+//	for(i=0;i < m; i++)
+//		{
+//			for(j=0;j < m; j++)
+//			{
+//				printf("%f,  i %d, j %d \n", V[transformer(i,j)], i, j);
+//			}
+//		}
 
 	// Receive all data to one node. 
 
@@ -204,7 +240,7 @@ int main(int argc, char** argv){
 			for(i = 1; i < m; i++)
 			{				
 				send = V_new[transformer(i,j)];
-				MPI_Send(&send, 1, MPI_FLOAT,0, transformer(i,j), MPI_COMM_WORLD);
+				MPI_Send(&send, 1, MPI_DOUBLE,0, transformer(i,j), MPI_COMM_WORLD);
 //				printf("Send rank %d 		i %d 		j %d with tag %d \n", world_rank, i ,j, transformer(i,j));
 			}
 		}
@@ -228,7 +264,7 @@ int main(int argc, char** argv){
 			{
 				for(i = 1; i < m; i++)
 				{				
-					MPI_Recv(&recv, 1, MPI_FLOAT, k,transformer(i,j), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					MPI_Recv(&recv, 1, MPI_DOUBLE, k,transformer(i,j), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 					V[transformer(i,j)] = recv;
 //					printf("Receive rank %d 	from %d	i %d 		j %d with tag %d \n", world_rank, k, i ,j, transformer(i,j));
 				}
@@ -243,7 +279,9 @@ int main(int argc, char** argv){
 		{
 			for(j=0;j < m; j++)
 			{
-				fprintf(f,"%f,  i %d, j %d \n", V[transformer(i,j)], i , j);
+//				fprintf(f,"%f,  i %d, j %d \n", V[transformer(i,j)], i , j);
+				fprintf(f,"%f\n", V[transformer(i,j)]);
+
 			}
 		}
 		fclose(f);

@@ -1,0 +1,9 @@
+CLUSTER 
+
+ssh fisi3028@clustergate.uniandes.edu.co
+rm .ssh/known_hosts
+lscpu
+qnodes
+colarse 
+showq
+qstat -q

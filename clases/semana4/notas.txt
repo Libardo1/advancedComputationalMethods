@@ -1,0 +1,23 @@
+Clase 7
+
+fflush para enviar printf el archivo 
+En el cluster para correr python en el .sh
+module load anaconda/python3
+
+Introduccion a OPENMP
+
+Introducir la libreria #include "omp.h"
+#pragma omp parallel{}
+en la linea para compilar se agrega FLAG = -fopenmp
+omp_get_thread_num() para tener el rank de la maquina 
+omp_set_num_threads(int value) para limitar el maximo de procesadores
+- #pragma omp parallel for sin llaves toma solo el primer for 
+  esta linea divide la informacion entre threads en orden 
+
+Reduction :
+#pragma omp parallel for reduction ( + : sum )  mantiene sum como privada en cada thread
+
+uso de cpu bg , top 
+eog abrir archivos png
+
+

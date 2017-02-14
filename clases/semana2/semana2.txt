@@ -1,8 +1,5 @@
 CLUSTER 
 
-fisi3028
-201710fisi3028
-
 ssh fisi3028@clustergate.uniandes.edu.co
 rm .ssh/known_hosts
 lscpu

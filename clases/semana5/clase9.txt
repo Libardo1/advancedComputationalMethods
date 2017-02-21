@@ -1,0 +1,13 @@
+Ecuaciones Diferenciales parciales 
+
+- Diferencias finitas
+forwardDifference 
+backwwardDifference 
+centerDifference
+
+parametro a*deltax/deltat<1 para tener estabilidad en la 
+solucion.
+
+lax
+lax-wendroff
+mac cormack

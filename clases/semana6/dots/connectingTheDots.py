@@ -29,4 +29,4 @@ for i in range(0,8):
     Y[3] = y[position]
     plt.plot(X,Y, linestyle='-')
      
-plt.show()
+plt.savefig('dots.png')

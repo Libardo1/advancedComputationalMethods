@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.loadtxt('serial.txt')
-size = int(np.sqrt(data.shape[0]))
-data = data.reshape(size, size)
+N = 64
+V = 200
+delta_t = 5E-3
+data = np.loadtxt('position.dat')
+data = data.reshape(V,N)
 plt.imshow(data, cmap='hot', interpolation='nearest')
-plt.savefig('serial.png')
-
+plt.savefig('evolution.png')

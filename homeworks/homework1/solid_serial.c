@@ -14,15 +14,16 @@ double betta = 1.0;
 
 double* init(double *array);
 void F(double * F_array, double * x);
+double omega(int k);
 
 // Main program
 
 int main(){
-
-  	int T = 5*pow(N,2.2);
-    int i,j,k,t,n,cont = 0;
-    int P = 1000, K = 3;
-    double Q, Qp, omega = 1.0;
+  	int T = 1.0*pow(N,2.2);
+    int i, j, k, t, n, cont = 0, cont2 = 0;
+    int P = 1000, K = 3, V = 200;
+    double Q, Qp;
+    int iterations = (int) T/delta_t;
 
   	// Create the grids to store N points in the solid
 
@@ -39,6 +40,10 @@ int main(){
     for(i=0; i<K; i++){
 		    energy[i] = (double *) malloc(P * sizeof(double *));
 	  }
+    double **DATA = (double **) malloc(V * sizeof(double *));
+    for(i=0; i<V; i++){
+        DATA[i] = (double *) malloc(N * sizeof(double *));
+    }
 
   	// Initial conditions for the solid
     // Position
@@ -52,11 +57,9 @@ int main(){
       F_grid_new[n] =0.0;
     }
 
-    // **********************************************	//
-	  // 							Leapfrog method										//
-	  // **********************************************	//
+    // ---------------- Leapfrog method ---------------------- //
 	  // We use the Leapfrog method expressed in x, v & a quantities with integer steps
-    for(t = 0; t < T; t++){
+    for(t = 0; t < iterations; t++){
       F(F_grid,x);
       for(n = 1; n < N-1; n++){
         x_new[n] = x[n] + ( v[n] * delta_t ) + (0.5 * F_grid[n] * pow(delta_t,2.0) );
@@ -70,50 +73,80 @@ int main(){
       x = x_new;
       v = v_new;
 
-//  		printf("iter: %d \n",t%N);
+      // -------------------- Store Data ----------------------- //
+      // Print the velocities and positions
+      if(t%(iterations/P) == 0){
+        // Print iterations
+        printf("iter: %d  from %d , cont :%d\n",t,iterations, cont);
 
-      if(t%(T/P) == 0){
         // Calculate the general position
         Q = 0.0; Qp = 0.0;
         for ( k = 1; k <= K; k++) {
           for ( n = 0; n < N; n++) {
-            Q = Q + x[n]*sin((PI*k*n)/(double)N);
-            Qp = Qp + v[n]*sin((PI*k*n)/(double)N);
+            //            printf("%d %d\n",k, n);
+            Q = Q + x[n]*sin((PI*(double)k*n)/(double)N);
+            Qp = Qp + v[n]*sin((PI*(double)k*n)/(double)N);
           }
           Q = Q * sqrt(2.0/(double)N);
           Qp = Qp * sqrt(2.0/(double)N);
-          energy[k-1][cont] = 0.5 * (pow(Q,2.0)+pow(omega*Qp,2.0));
+
+          energy[k-1][cont] = 0.5 * (pow(Q,2.0)+pow(omega(k)*Qp,2.0));
+          printf("%f %f\n", energy[k-1][cont], Qp );
+
         }
         cont++;
       }
+      // Position
+      if(t%(iterations/V) == 0 && cont2<V){
+        printf("Saving data position, cont2 : %d\n", cont2);
+        for (int i = 0; i < N; i++) {
+          DATA[cont2][i] = x[i];
+        }
+        cont2++;
+      }
+      // -------------------- Store Data ----------------------- //
     }
+    // ---------------- Leapfrog method ---------------------- //
 
-    // w2?
-    // Print results
-    for(i = 0; i<K;i++){
+    // ------------------- Print results --------------------- //
+    // Energy
+    FILE * file1 = fopen("energy.dat","w");
+    for(i=0; i<K ; i++){
       for(j = 0; j<P;j++){
-        printf("%f \n", energy[i][j]);
+        fprintf(file1,"%f \n", energy[i][j]);
       }
     }
+    fclose(file1);
+
+    // Position
+    FILE * file2 = fopen("position.dat","w");
+    for(i=0; i<V ; i++){
+      for(j = 0; j<N;j++){
+        fprintf(file2,"%f \n", DATA[i][j]);
+      }
+    }
+    fclose(file2);
+    // ------------------- Print results --------------------- //
   	return(0);
 }
 
 // Auxiliar functions
 
 double *init(double *array){
-    int i;
   	array[0] = 0.0;
   	array[N-1] = 0.0;
 
-	  for(i=1; i<N-1; i++){
-		    array[i] = sin(PI*(double)i/(double)(N-1));
+	  for(int n=1; n<N-1; n++){
+		    array[n] = sin(PI*(double)n/(double)(N-1));
 	  }
 	  return array;
 }
-
 void F(double * F_array, double * x){
-	int n;
-	for(n = 1; n < N-1; n++){
-		F_array[n] = (x[n+1] - 2.0 * x[n] + x[n-1]) + betta * (pow((x[n+1] - x[n]),3.0) - pow((x[n] - x[n-1]),3.0) );
+	for(int n = 1; n < N-1; n++){
+		F_array[n] = (x[n+1] - 2.0 * x[n] + x[n-1]) +
+    betta * (pow((x[n+1] - x[n]),2.0) - pow((x[n] - x[n-1]),2.0) );
 	}
+}
+double omega(int k){
+  return 2*sin(PI*k/((double)((2*N)+2)));
 }

@@ -1,11 +1,14 @@
-serial.png: plot.py serial.txt
-	python plot.py
-serial.txt: serial
-	./serial >serial.txt
+all: energy.png
 
-serial: solid_serial.c
-	cc solid_serial.c -o serial 
+energy.png: energy.dat
+	python energyPlot.py
+evolution.png: 2Dplot.py position.dat
+	python 2Dplot.py
+energy.dat: serial.out
+	./serial.out
+serial.out: solid_serial.c
+	cc solid_serial.c -o serial.out
 clean:
 	rm *.png
-	rm serial
-	rm serial.txt
+	rm *.out
+	rm *.dat

@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){
       // Print the velocities and positions
       if(t%(iterations/P) == 0){
         // Print iterations
-        printf("iter: %d  from %d , cont :%d\n",t,iterations, cont);
+//        printf("iter: %d  from %d , cont :%d\n",t,iterations, cont);
 
         // Calculate the general position
         Q = 0.0; Qp = 0.0;

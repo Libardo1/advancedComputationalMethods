@@ -1,0 +1,19 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.array([3,5,12])
+min = 0 
+max = 100
+N = 100
+
+lambda = np.linspace(min,max,N)
+
+verosimilitud = 1
+
+for i in range(1,4):
+    verosimilitud = verosimilitud * np.exp(-x[i]/lambda) 
+
+posterior = verosimilitud*(1/N)
+plot(lambda, posterior)
+show()
+

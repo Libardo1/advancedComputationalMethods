@@ -1,0 +1,10 @@
+Hello from thread 3, nthreads 10
+Hello from thread 1, nthreads 10
+Hello from thread 4, nthreads 10
+Hello from thread 2, nthreads 10
+Hello from thread 5, nthreads 10
+Hello from thread 6, nthreads 10
+Hello from thread 7, nthreads 10
+Hello from thread 8, nthreads 10
+Hello from thread 0, nthreads 10
+Hello from thread 9, nthreads 10

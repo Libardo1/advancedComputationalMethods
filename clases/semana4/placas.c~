@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 int L = 5, l = 2, d = 1, V0 = 100, m, N;
-double h = 0.02;
+double h = 0.2;
 
 int transformer(int i, int j);
 double *init(int x0, int x1, int y0, int y1, double *array);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <omp.h>
 int L = 5, l = 2, d = 1, V0 = 100, m, N;
 double h = 0.2;
 

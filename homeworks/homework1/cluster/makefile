@@ -1,4 +1,6 @@
 all: energy.png
+test:
+	gfortran test.c -fopenmp 
 energy.png: energy.dat
 	python energyPlot.py
 evolution.png: 2Dplot.py position.dat

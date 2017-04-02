@@ -23,7 +23,7 @@ double omega(int k);
 int main(int argc, char *argv[]){
 
     clock_t tic = clock();
-  	int T = 1.0*pow(N,2.2);
+  	int T = 5.0*pow(N,2.2);
     int i, j, k, t, n, cont = 0, cont2 = 0;
     int P = 1000, K = 3, V = 200;
     double Q, Qp;

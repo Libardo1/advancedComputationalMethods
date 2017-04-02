@@ -5,14 +5,14 @@ import os
 import shutil
 
 N = 64
-V = 50
+V = 200
 
 data = np.loadtxt('position.dat')
-data = np.reshape(data,(V,N))
+data = data.reshape(V,N)
 
 os.mkdir('temp')
 with imageio.get_writer('./movimiento.gif', mode='I') as writer:
-    for i in range(len(data[:,0])):
+    for i in range(100):
         fig=plt.figure()
         plt.grid()
         plt.plot(data[i,:], 'bo')

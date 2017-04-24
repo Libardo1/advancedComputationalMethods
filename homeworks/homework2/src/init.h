@@ -1,0 +1,12 @@
+double energy(double p,double r,double v);
+double presion(double e, double r,double v);
+void init_to_zero(FLOAT *p, int n_points);
+physics_grid * create_physics_grid(void);
+U_grid * create_U_grid(void);
+F_grid * create_F_grid(void);
+void init_problem(physics_grid *P, U_grid *U, F_grid *F);
+void initial_conditions(physics_grid *P, U_grid *U, F_grid *F);
+void fromU2F(F_grid *F, U_grid *U);
+void U_star_update(U_grid *U, F_grid *F,double alpha);
+void U_update(U_grid *U, F_grid *F,double alpha);
+void fromU2var(physics_grid *P, U_grid *U);

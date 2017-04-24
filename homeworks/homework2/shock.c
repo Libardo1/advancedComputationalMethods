@@ -124,7 +124,7 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-void init_to_zero(double *p, int n_points){
+void init_to_zero(double * p, int n_points){
   int i;
   for(i=0;i<n_points;i++){
     p[i] = 0.0;
@@ -202,6 +202,7 @@ void init(double *r, double *p, double *v,double*e, double*x, double *u1, double
   }
 
 }
+
 double energy(double p,double r,double v){
   return (p/(gam-1)) + (r*pow(v,2.0))/2.0;
 }

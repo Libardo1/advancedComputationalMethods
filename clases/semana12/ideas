@@ -1,0 +1,10 @@
+We have a high dimensional data set (almost 100K features).
+The first idea is to reduce de dimensionality of problem.
+
+http://www.kdnuggets.com/2015/05/7-methods-data-dimensionality-reduction.html
+
+Step by Step
+
+1. Normalize variables  (Mean = 0, Std = 1)
+2. Implement PCA to reduce dimensionality
+

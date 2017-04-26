@@ -201,22 +201,34 @@ void initial_conditions(physics_grid *P, U_grid *U, F_grid *F){
     U->U_3[i] = P->ene[i];
     F->F_1[i] = P->vel[i]*P->rho[i];
     F->F_2[i] = P->rho[i]*pow(P->vel[i],2.0) + P->pres[i];
-    F->F_3[i] = P->vel[i]*P->ene[i] + P->pres[i];
+    F->F_3[i] = P->vel[i]*(P->ene[i] + P->pres[i]);
   }
 }
-void fromU2F(F_grid *F, U_grid *U){
+void fromU2F(F_grid *F, U_grid *U,int cases){
   int i;
   double v,p;
-
-  for (i = 0; i < F->N; i++) {
-    v = U->U_2[i]/U->U_1[i];
-    p = presion(U->U_3[i],U->U_1[i],v);
-    F->F_1[i] = U->U_2[i];
-    F->F_2[i] = U->U_1[i]*pow(v,2.0) + p;
-    F->F_3[i] = v*U->U_3[i] + p;
+  // 1 == star
+  if (cases == 1) {
+    for (i = 0; i < F->N; i++) {
+      v = U->U_2_star[i]/U->U_1_star[i];
+      p = presion(U->U_3_star[i],U->U_1_star[i],v);
+      F->F_1_star[i] = U->U_2_star[i];
+      F->F_2_star[i] = U->U_1_star[i]*pow(v,2.0) + p;
+      F->F_3_star[i] = v*(U->U_3_star[i] + p);
+    }
+  }
+  // 0 == star
+  else if (cases == 0){
+    for (i = 0; i < F->N; i++) {
+      v = U->U_2[i]/U->U_1[i];
+      p = presion(U->U_3[i],U->U_1[i],v);
+      F->F_1[i] = U->U_2[i];
+      F->F_2[i] = U->U_1[i]*pow(v,2.0) + p;
+      F->F_3[i] = v*(U->U_3[i] + p);
+    }
   }
 }
-void U_star_update(U_grid *U, F_grid *F,double alpha){
+void U_star_update_mac(U_grid *U, F_grid *F,double alpha){
   U->U_1_star = U->U_1;
   U->U_2_star = U->U_2;
   U->U_3_star = U->U_3;
@@ -227,7 +239,7 @@ void U_star_update(U_grid *U, F_grid *F,double alpha){
     U->U_3_star[i]=U->U_3[i]-alpha*(F->F_3[i+1]-F->F_3[i]);
   }
 }
-void U_update(U_grid *U, F_grid *F,double alpha){
+void U_update_mac(U_grid *U, F_grid *F,double alpha){
   int i;
   U->U_1_new=U->U_1;
   U->U_2_new=U->U_2;
@@ -238,6 +250,28 @@ void U_update(U_grid *U, F_grid *F,double alpha){
     U->U_3_new[i]=0.5*(U->U_3[i]+U->U_3_star[i]-alpha*(F->F_3_star[i]-F->F_3_star[i-1]));
   }
 }
+void U_star_update(U_grid *U, F_grid *F,double alpha){
+  U->U_1_star = U->U_1;
+  U->U_2_star = U->U_2;
+  U->U_3_star = U->U_3;
+  int i;
+  for ( i = 1; i < U->N-1; i++) {
+    U->U_1_star[i] = 0.5*((U->U_1[i+1]+ U->U_1[i]) - alpha*(F->F_1[i+1]-F->F_1[i]));
+    U->U_2_star[i] = 0.5*((U->U_2[i+1]+ U->U_2[i]) - alpha*(F->F_2[i+1]-F->F_2[i]));
+    U->U_3_star[i] = 0.5*((U->U_3[i+1]+ U->U_3[i]) - alpha*(F->F_3[i+1]-F->F_3[i]));
+  }
+}
+void U_update(U_grid *U, F_grid *F,double alpha){
+  int i;
+  U->U_1_new=U->U_1;
+  U->U_2_new=U->U_2;
+  U->U_3_new=U->U_3;
+  for( i = 1; i<U->N;i++){
+    U->U_1_new[i] = (U->U_1[i] - alpha*(F->F_1_star[i]-F->F_1_star[i-1]));
+    U->U_2_new[i] = (U->U_2[i] - alpha*(F->F_2_star[i]-F->F_2_star[i-1]));
+    U->U_3_new[i] = (U->U_3[i] - alpha*(F->F_3_star[i]-F->F_3_star[i-1]));
+  }
+}
 void fromU2var(physics_grid *P, U_grid *U){
   int i;
   for (i = 0; i < U->N; i++){
@@ -246,4 +280,16 @@ void fromU2var(physics_grid *P, U_grid *U){
     P->pres[i]=presion(U->U_3[i], U->U_1[i], P->vel[i]);
     P->ene[i]=U->U_3[i];
   }
+}
+double max_velocity(physics_grid * P){
+  int i;
+  double vel;
+  double max_vel = sqrt((GAMMA*fabs(P->pres[0])/P->rho[0])) + fabs(P->vel[0]);
+  for (i = 1; i < P->N; i++) {
+    vel = sqrt((GAMMA*fabs(P->pres[i])/P->rho[i])) + fabs(P->vel[i]);
+    if( vel > max_vel) {
+      max_vel = vel;
+    }
+  }
+  return max_vel;
 }

@@ -8,8 +8,8 @@
 int main(int argc, char const *argv[]) {
   double t=0.0;
   int i;
-  double delta_t=0.001;
-  double T = 0.01;
+  double delta_t=0.0001;
+  double T = 0.1;
   double alpha;
   physics_grid * P_state;
   U_grid * U_state;
@@ -23,13 +23,11 @@ int main(int argc, char const *argv[]) {
   initial_conditions(P_state, U_state, F_state);
 
   while (t<T) {
+    delta_t = (0.5*DELTA_X)/max_velocity(P_state);
     alpha = delta_t/P_state->delta_x;
+    fromU2F(F_state,U_state,NO_STAR);
     U_star_update(U_state,F_state,alpha);
-    printf("iter: %f t \n", t );
-    for ( i = 0; i < U_state->N; i++) {
-      printf("%d %f %f %f\n", i, U_state->U_1_star[i],U_state->U_2_star[i],U_state->U_3_star[i] );
-    }
-    fromU2F(F_state,U_state);
+    fromU2F(F_state,U_state,STAR);
     U_update(U_state,F_state,alpha);
     U_state->U_1 = U_state->U_1_new;
     U_state->U_2 = U_state->U_2_new;

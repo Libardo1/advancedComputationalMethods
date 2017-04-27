@@ -241,7 +241,7 @@ def U_update_l(u1, u2, u3, u1_star, u2_star, u3_star, f1_star, f2_star, f3_star,
 init(rho, pres, vel, pos, U1, U2, U3, F1, F2, F3)
 
 t=0.0
-T=0.1
+T=0.2
 
 while t<T:
     R,P,V,E = fromU2var(U1, U2, U3)

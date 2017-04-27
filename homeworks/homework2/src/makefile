@@ -3,8 +3,8 @@ CC_OPTIONS =   -O2 -Wall
 EXEC = shock.x
 LIBS = -lm
 
-OBJS = struct.o init.o io.o shock.o
-INCL = Makefile struct.h io.h init.h
+OBJS = struct.o func.o io.o shock.o
+INCL = Makefile struct.h io.h func.h
 
 
 all: $(EXEC)

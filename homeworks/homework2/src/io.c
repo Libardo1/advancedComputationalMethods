@@ -1,6 +1,7 @@
 #include "struct.h"
 #include <stdlib.h>
 #include <stdio.h>
+
 void print_physics_grid(physics_grid *P){
   int i;
   FILE *fp;

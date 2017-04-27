@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include "struct.h"
-#include "init.h"
+#include "func.h"
 #include "io.h"
 
 int main(int argc, char const *argv[]) {
   double t=0.0;
   int i;
-  double delta_t=0.0001;
+  double delta_t;
   double T = 0.1;
   double alpha;
   physics_grid * P_state;

@@ -1,7 +1,8 @@
-#include "struct.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "calibration.h"
+#include "struct.h"
 
 double energy(double p,double r,double v){
   return (p/(GAMMA-1)) + (r*pow(v,2.0))/2.0;
@@ -184,14 +185,14 @@ void init_problem(physics_grid *P, U_grid *U, F_grid *F){
 void initial_conditions(physics_grid *P, U_grid *U, F_grid *F){
   int i;
   for (i = 0; i < P->N; i++) {
-    P->vel[i] = 0.00;
-    if(P->pos[i] <= 0.500000){
-      P->rho[i] = 1.0;
-      P->pres[i] = 1.0;
+    P->vel[i] = V0;
+    if(P->pos[i] <= X0){
+      P->rho[i] = RL;
+      P->pres[i] = PL;
     }
-    else if(P->pos[i]>0.500000){
-      P->rho[i] = 0.125;
-      P->pres[i] = 0.1;
+    else if(P->pos[i]> X0){
+      P->rho[i] = RR;
+      P->pres[i] = PR;
     }
 
     P->ene[i] = energy(P->pres[i],P->rho[i],P->vel[i]);

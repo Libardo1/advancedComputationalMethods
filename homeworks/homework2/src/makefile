@@ -3,8 +3,8 @@ CC_OPTIONS =   -O2 -Wall
 EXEC = shock.x
 LIBS = -lm
 
-OBJS = struct.o func.o io.o shock.o
-INCL = Makefile struct.h io.h func.h
+OBJS = struct.o func.o io.o calibration.o shock.o 
+INCL = Makefile struct.h io.h func.h calibration.h
 
 
 all: $(EXEC)

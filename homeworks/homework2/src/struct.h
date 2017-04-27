@@ -1,10 +1,5 @@
 #ifndef STRUCT_H
 #define STRUCT_H
-#define GAMMA 1.4
-#define LEN_TUBE 1.0
-#define DELTA_X 0.01
-#define STAR 1
-#define NO_STAR 0
 #define FLOAT double
 typedef struct physics_grid_str{
   int N;

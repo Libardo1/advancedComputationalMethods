@@ -2,22 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
-data = np.loadtxt('data.dat')
-# load parameters
-gam=1.4
-delx=0.01
-L=1.0
-N=int(L/delx)
-mu = np.sqrt( (gam-1)/(gam+1) )
-T = 0.1
-rl = 1.0
-pl = 1.0
-ul = 0.0
-rr = 0.125
-pr = 0.1
-ur = 0.0
-x0 = 0.5
-
 # analytical solution functions
 def sod_func(P):
     return (P - pr)*(( ((1 - mu**2)**2)*((rr*(P + mu*mu*pr))**(-1)) )**0.5) - 2*(np.sqrt(gam)/(gam - 1))*(1 - P**((gam - 1)/(2*gam)))
@@ -73,7 +57,15 @@ def analytic_sod(t):
         #e[index] = ener(P[index],rho[index],u[index])
     return rho,P,u,e
 
+# load parameters
+T,CFL,x0,rl,pl,u0,rr,pr,delx,gam,L = np.loadtxt('calibration.dat')
+ul = u0
+ur = u0
+mu = np.sqrt( (gam-1)/(gam+1) )
+N=int(L/delx)
+
 # load numeric solution
+data = np.loadtxt('data.dat')
 x = data[:,0]
 r = data[:,1]
 v = data[:,2]
@@ -87,51 +79,55 @@ ra,pa,va,ea = analytic_sod(T)
 fig=plt.figure()
 ax=plt.axes()
 plt.grid()
-plt.plot(x, r)
-plt.plot(x, ra)
+plt.plot(x, r,'ro-',linewidth=1.5,label='Numerical Sol')
+plt.plot(x, ra,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim(np.min(r)-0.1, np.max(r)+0.1)
-plt.xlabel(r"Posición ($x$)")
-plt.ylabel(r"Densidad ($\rho$)")
-plt.title(r"Densidad contra posición")
+plt.xlabel(r"Position ($x$)")
+plt.ylabel(r"$\rho$")
+plt.title(r"Density")
 plt.axvline(0.5, color='k', linestyle='solid')
+plt.legend()
 plt.savefig('Densidad.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
 ax=plt.axes()
 plt.grid()
-plt.plot(x, p)
-plt.plot(x, pa)
+plt.plot(x, p,'ro-',linewidth=1.5,label='Numerical Sol')
+plt.plot(x, pa,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(p)-0.1, np.max(p)+0.1))
-plt.xlabel(r"Posicion ($x$)")
-plt.ylabel(r"Presion ($P$)")
-plt.title(r"Presion contra posicion")
+plt.xlabel(r"Position ($x$)")
+plt.ylabel(r"$P$")
+plt.title(r"Pressure")
 plt.axvline(0.5, color='k', linestyle='solid')
+plt.legend()
 plt.savefig('Presion.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
 ax=plt.axes()
 plt.grid()
-plt.plot(x, v)
-plt.plot(x, va)
+plt.plot(x, v,'ro-',linewidth=1.5,label='Numerical Sol')
+plt.plot(x, va,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(v)-0.1, np.max(v)+0.1))
-plt.xlabel(r"Posicion ($x$)")
-plt.ylabel(r"Velocidad ($v$)")
-plt.title(r"Velocidad contra posicion")
+plt.xlabel(r"Position ($x$)")
+plt.ylabel(r"$v$")
+plt.title(r"Velocity")
 plt.axvline(0.5, color='k', linestyle='solid')
+plt.legend()
 plt.savefig('Velocidad.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
 ax=plt.axes()
 plt.grid()
-plt.plot(x, e)
-plt.plot(x, ea)
+plt.plot(x, e,'ro-',linewidth=1.5,label='Numerical Sol')
+plt.plot(x, ea,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(e)-0.1, np.max(e)+0.1))
-plt.xlabel(r"Posicion ($x$)")
-plt.ylabel(r"Energia ($e$)")
-plt.title(r"Energia contra posicion")
+plt.xlabel(r"Position ($x$)")
+plt.ylabel(r"$e$")
+plt.title(r"Internal Energy")
 plt.axvline(0.5, color='k', linestyle='solid')
+plt.legend()
 plt.savefig('Energia.pdf', format='pdf')
 plt.close()

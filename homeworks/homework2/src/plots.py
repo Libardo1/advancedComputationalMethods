@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
@@ -75,6 +77,8 @@ e = data[:,4]
 # get the analytical solution
 ra,pa,va,ea = analytic_sod(T)
 
+
+fig=plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, r,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -88,6 +92,7 @@ plt.legend()
 plt.savefig('Densidad.pdf', format='pdf')
 plt.close()
 
+fig=plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, p,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -101,6 +106,7 @@ plt.legend()
 plt.savefig('Presion.pdf', format='pdf')
 plt.close()
 
+fig=plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, v,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -114,6 +120,7 @@ plt.legend()
 plt.savefig('Velocidad.pdf', format='pdf')
 plt.close()
 
+fig=plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, e,'ro-',linewidth=1.5,label='Numerical Sol')

@@ -75,8 +75,6 @@ e = data[:,4]
 # get the analytical solution
 ra,pa,va,ea = analytic_sod(T)
 
-
-plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, r,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -90,7 +88,6 @@ plt.legend()
 plt.savefig('Densidad.pdf', format='pdf')
 plt.close()
 
-plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, p,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -104,7 +101,6 @@ plt.legend()
 plt.savefig('Presion.pdf', format='pdf')
 plt.close()
 
-plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, v,'ro-',linewidth=1.5,label='Numerical Sol')
@@ -118,7 +114,6 @@ plt.legend()
 plt.savefig('Velocidad.pdf', format='pdf')
 plt.close()
 
-plt.figure()
 ax=plt.axes()
 plt.grid()
 plt.plot(x, e,'ro-',linewidth=1.5,label='Numerical Sol')

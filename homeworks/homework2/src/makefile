@@ -1,18 +1,35 @@
 CC = gcc
 CC_OPTIONS =   -O2 -Wall
-EXEC = shock.x
 LIBS = -lm
 
-OBJS = struct.o func.o io.o calibration.o shock.o 
-INCL = Makefile struct.h io.h func.h calibration.h
+OBJS_SHOCK = structShock.o funcShock.o ioShock.o calibrationShock.o shock.o
+INCL_SHOCK = Makefile structShock.h ioShock.h funcShock.h calibrationShock.h
 
+OBJS_SEDOV = structSedov.o Zedov.o
+INCL_SEDOV = Makefile structSedov.h
 
-all: $(EXEC)
+plotshock: shock
+	python plotshock.py
+
+plotsedov: sedov
+		python plotsedov.py
+
+shock: shock.x
+	./shock.x
+
+sedov: sedov.x
+	./sedov.x
+
+exec: shock.x sedov.x
 
 .c.o:
 	$(CC) $(CC_OPTIONS) -c $<
 
-$(EXEC):$(OBJS)
-	$(CC) $(OBJS) $(LIBS) -o $(EXEC)
+shock.x:$(OBJS_SHOCK)
+	$(CC) $(OBJS_SHOCK) $(LIBS) -o shock.x
+
+sedov.x:$(OBJS_SEDOV)
+	$(CC) $(OBJS_SEDOV) $(LIBS) -o sedov.x
+
 clean:
-	rm -f $(OBJS) *~ core* ${EXEC} *.dat
+	rm -f $(OBJS_SHOCK) $(OBJS_SEDOV) *~ core* *.x *.dat *.pdf *.txt

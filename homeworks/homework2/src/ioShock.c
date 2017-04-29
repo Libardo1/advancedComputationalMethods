@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "struct.h"
-#include "calibration.h"
+#include "structShock.h"
+#include "calibrationShock.h"
 void print_physics_grid(physics_grid *P){
   int i;
   FILE *fp;
-  fp = fopen("data.dat", "w");
+  fp = fopen("dataShock.dat", "w");
   if (fp == NULL) {
     fprintf(stderr, "Can't open input file in.list!\n");
     exit(1);
@@ -15,10 +15,9 @@ void print_physics_grid(physics_grid *P){
   }
   fclose(fp);
 }
-
 void print_calibration(){
   FILE *fp;
-  fp = fopen("calibration.dat", "w");
+  fp = fopen("calibrationShock.dat", "w");
   if (fp == NULL) {
     fprintf(stderr, "Can't open input file in.list!\n");
     exit(1);

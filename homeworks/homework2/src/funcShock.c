@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "calibration.h"
-#include "struct.h"
+#include "calibrationShock.h"
+#include "structShock.h"
 
 double epsilon(double p,double r, double v){
   return p/(GAMMA-1) + 0.5*pow(r*v,2.0);

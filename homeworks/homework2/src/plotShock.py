@@ -60,14 +60,14 @@ def analytic_sod(t):
     return rho,P,u,e
 
 # load parameters
-T,CFL,x0,rl,pl,u0,rr,pr,delx,gam,L = np.loadtxt('calibration.dat')
+T,CFL,x0,rl,pl,u0,rr,pr,delx,gam,L = np.loadtxt('calibrationShock.dat')
 ul = u0
 ur = u0
 mu = np.sqrt( (gam-1)/(gam+1) )
 N=int(L/delx)
 
 # load numeric solution
-data = np.loadtxt('data.dat')
+data = np.loadtxt('dataShock.dat')
 x = data[:,0]
 r = data[:,1]
 v = data[:,2]
@@ -77,7 +77,6 @@ e = data[:,4]
 # get the analytical solution
 ra,pa,va,ea = analytic_sod(T)
 
-
 fig=plt.figure()
 ax=plt.axes()
 plt.grid()
@@ -86,10 +85,10 @@ plt.plot(x, ra,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim(np.min(r)-0.1, np.max(r)+0.1)
 plt.xlabel(r"Position ($x$)")
 plt.ylabel(r"$\rho$")
-plt.title(r"Density")
+plt.title(r"Density - Shock Problem")
 plt.axvline(0.5, color='k', linestyle='solid')
 plt.legend()
-plt.savefig('Densidad.pdf', format='pdf')
+plt.savefig('DensidadShock.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
@@ -100,10 +99,10 @@ plt.plot(x, pa,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(p)-0.1, np.max(p)+0.1))
 plt.xlabel(r"Position ($x$)")
 plt.ylabel(r"$P$")
-plt.title(r"Pressure")
+plt.title(r"Pressure - Shock Problem")
 plt.axvline(0.5, color='k', linestyle='solid')
 plt.legend()
-plt.savefig('Presion.pdf', format='pdf')
+plt.savefig('PresionShock.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
@@ -114,10 +113,10 @@ plt.plot(x, va,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(v)-0.1, np.max(v)+0.1))
 plt.xlabel(r"Position ($x$)")
 plt.ylabel(r"$v$")
-plt.title(r"Velocity")
+plt.title(r"Velocity - Shock Problem")
 plt.axvline(0.5, color='k', linestyle='solid')
 plt.legend()
-plt.savefig('Velocidad.pdf', format='pdf')
+plt.savefig('VelocidadShock.pdf', format='pdf')
 plt.close()
 
 fig=plt.figure()
@@ -128,8 +127,8 @@ plt.plot(x, ea,'b-',linewidth=2.0,label='Analytical Sol')
 plt.ylim((np.min(e)-0.1, np.max(e)+0.1))
 plt.xlabel(r"Position ($x$)")
 plt.ylabel(r"$e$")
-plt.title(r"Internal Energy")
+plt.title(r"Internal Energy - Shock Problem")
 plt.axvline(0.5, color='k', linestyle='solid')
 plt.legend()
-plt.savefig('Energia.pdf', format='pdf')
+plt.savefig('EnergiaShock.pdf', format='pdf')
 plt.close()

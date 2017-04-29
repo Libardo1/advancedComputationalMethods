@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "struct.h"
-#include "func.h"
-#include "io.h"
-#include "calibration.h"
+#include "structShock.h"
+#include "funcShock.h"
+#include "ioShock.h"
+#include "calibrationShock.h"
 
 /* ------------------------------- MAIN ---------------------------------- */
 int main(int argc, char const *argv[]) {

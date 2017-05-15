@@ -11,6 +11,9 @@ Topics:
   - Leapfrog method
   - Lax method
   - simplectic integra.
+  - Finite Differences. 
+  - Finite Elements.
+  - Finite Volumes. 
   
 - Statistics
   - Monte Carlo Markov Chains.

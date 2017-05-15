@@ -12,6 +12,20 @@ Topics:
   - Lax method
   - simplectic integra.
   
+- Statistics
+  - Monte Carlo Markov Chains.
+  - Metropolis-Hastings.
+  - Hamiltonian Monte Carlo. 
+  - Bayesian Estimation. 
+  
 - Machine Learning
-
+  - Linear Regression.
+  - Decision Trees.
+  - Random forest.
+  - K Nearest Neighbor.
+  - K means
+  - Support Vector Machine.
+  - Regularization: LASSO & RIGDE.
+  - Neural Networks.
+  - Data Shuffling. 
   
